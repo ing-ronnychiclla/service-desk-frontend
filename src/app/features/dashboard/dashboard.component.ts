@@ -33,6 +33,9 @@ export class DashboardComponent implements OnInit {
     closed: 0
   };
   
+  // Estado del Filtro de Estado
+  selectedStatus: string = 'ALL';
+
   // Formulario Reactivo
   ticketForm: FormGroup = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(5)]],
@@ -47,17 +50,28 @@ export class DashboardComponent implements OnInit {
 
   loadTickets(): void {
     this.isLoading = true;
-    this.ticketService.getTickets(0, 100).subscribe({
+    const filterStatus = this.selectedStatus === 'ALL' ? undefined : this.selectedStatus;
+    
+    this.ticketService.getTickets(0, 100, filterStatus).subscribe({
       next: (res) => { 
         this.ticketData = res; 
         this.isLoading = false; 
-        this.calculateStats(res.content);
+        // Solo recalculamos las estadísticas si estamos cargando TODOS los tickets
+        // para preservar los números globales en las tarjetas de estadísticas.
+        if (this.selectedStatus === 'ALL') {
+          this.calculateStats(res.content);
+        }
       },
       error: (err) => { 
         this.isLoading = false; 
         console.error('Error al cargar tickets:', err);
       }
     });
+  }
+
+  filterByStatus(status: string): void {
+    this.selectedStatus = status;
+    this.loadTickets();
   }
 
   calculateStats(tickets: Ticket[]): void {
@@ -85,6 +99,7 @@ export class DashboardComponent implements OnInit {
       next: () => {
         this.isSaving = false;
         this.toggleModal();
+        this.selectedStatus = 'ALL'; // Resetear el filtro para ver el nuevo ticket
         this.loadTickets(); // Recargamos la tabla para ver el nuevo ticket
       },
       error: (err) => {
