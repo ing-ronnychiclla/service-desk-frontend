@@ -1,0 +1,339 @@
+<div class="min-h-screen relative pb-12 overflow-hidden bg-slate-50">
+  
+  <!-- Glowing Spotlights in the background -->
+  <div class="ambient-glow"></div>
+  <div class="absolute w-[500px] h-[500px] rounded-full bg-indigo-500/5 blur-[150px] -top-1/4 -left-1/4 animate-pulse-slow"></div>
+  <div class="absolute w-[450px] h-[450px] rounded-full bg-purple-500/5 blur-[130px] top-1/2 -right-1/4 animate-float"></div>
+
+  <!-- Header Navigation -->
+  <header class="sticky top-0 z-40 w-full border-b border-slate-200/80 bg-white/80 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 21m0 0-.762-.508m.762.508 1.444-2.407m3.111-2.989a8.125 8.125 0 0 0 1.488-4.482c0-3.32-2.73-6.02-6.1-6.02m0 0a6.115 6.115 0 0 0-4.73 2.247m4.73-2.247c.189.362.354.743.496 1.139m0 0c.277.77.411 1.57.411 2.378 0 1.948-.83 3.702-2.166 4.922m2.166-4.922c-.004.01-.008.02-.012.03m0 0M21 12c0 4.578-3.82 8.25-8.5 8.25-2.33 0-4.437-.905-5.972-2.379m0 0L3 18m0 0 1.344-2.457A8.192 8.192 0 0 1 3 12c0-4.578 3.82-8.25 8.5-8.25H12" />
+          </svg>
+        </div>
+        <span class="text-xl font-black tracking-tight text-slate-900">Service Desk</span>
+      </div>
+
+      <!-- Environment & Actions -->
+      <div class="flex items-center space-x-4">
+        <!-- User Welcome Badge -->
+        <span class="hidden md:inline-flex items-center px-3 py-1 rounded-xl text-xs font-semibold bg-indigo-50/80 text-indigo-600 border border-indigo-100">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+          </svg>
+          {{ authService.getUserEmail() }}
+          <span class="ml-2 px-1.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider bg-indigo-600 text-white">
+            {{ authService.getUserRole() }}
+          </span>
+        </span>
+
+        <!-- Connection Estatus Tag -->
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+          <span class="w-1.5 h-1.5 rounded-full mr-1.5 animate-pulse bg-emerald-500"></span>
+          Conectado a AWS
+        </span>
+
+        <!-- Logout Trigger -->
+        <button (click)="logout()" class="p-2 rounded-xl text-slate-400 hover:text-slate-900 hover:bg-white border border-transparent hover:border-slate-200 transition-all duration-200" title="Cerrar Sesión">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+          </svg>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-8">
+    
+    <!-- Title Page Area -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+      <div>
+        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight sm:text-4xl">
+          Panel de Control
+        </h1>
+        <p class="mt-1 text-sm text-slate-400 font-medium">
+          Monitorea, resuelve y gestiona las solicitudes técnicas de la organización.
+        </p>
+      </div>
+      
+      <!-- Primary CTA button (Solo para Empleados) -->
+      <button *ngIf="authService.isEmployee()" (click)="toggleModal()" type="button"
+              class="inline-flex justify-center items-center px-5 py-2.5 rounded-xl border border-indigo-500/30 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.25)] hover:shadow-[0_0_35px_rgba(99,102,241,0.4)] transition-all duration-300 transform hover:-translate-y-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 mr-2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Nuevo Ticket
+      </button>
+    </div>
+    
+    <!-- Welcome message card for roles -->
+    <div class="glass-panel p-6 rounded-2xl border border-slate-200/80 shadow-[0_8px_30px_rgba(0,0,0,0.2)] flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-gradient-to-r from-indigo-500/5 via-transparent to-purple-500/5">
+      <div class="flex items-center space-x-4">
+        <div class="w-12 h-12 rounded-2xl bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center text-indigo-600">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-black text-slate-800 tracking-tight">¡Bienvenido de nuevo, {{ authService.getUserEmail() }}! 👋</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Has iniciado sesión con el rol de <span class="font-extrabold text-indigo-600 tracking-wide uppercase">{{ authService.getUserRole() }}</span></p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2 text-xs text-indigo-600 font-bold bg-indigo-50 border border-indigo-100/50 px-3 py-1.5 rounded-xl self-start md:self-auto shadow-sm animate-pulse">
+        <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+        <span>Sesión Segura y Sincronizada</span>
+      </div>
+    </div>
+
+    <!-- Stats deck Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      
+      <!-- Stat 1: Total -->
+      <div class="glass-panel p-6 rounded-2xl border border-slate-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.2)] hover:border-slate-300/80 transition-all duration-300">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total de Casos</p>
+            <h3 class="text-3xl font-extrabold text-slate-900 mt-2">{{ stats.total }}</h3>
+          </div>
+          <div class="p-2 rounded-xl bg-slate-100 text-slate-600">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+            </svg>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center text-xs text-slate-400 font-medium">
+          <span>Tickets acumulados en el sistema</span>
+        </div>
+      </div>
+
+      <!-- Stat 2: Open -->
+      <div class="glass-panel p-6 rounded-2xl border border-slate-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.2)] hover:border-indigo-500/20 transition-all duration-300">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Abiertos</p>
+            <h3 class="text-3xl font-extrabold text-indigo-600 mt-2">{{ stats.open }}</h3>
+          </div>
+          <div class="p-2 rounded-xl bg-indigo-100 border border-indigo-200 text-indigo-600">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+            </svg>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center text-xs text-indigo-400/80 font-medium">
+          <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 mr-1.5 animate-pulse"></span>
+          <span>Pendientes de asignación</span>
+        </div>
+      </div>
+
+      <!-- Stat 3: In Progress -->
+      <div class="glass-panel p-6 rounded-2xl border border-slate-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.2)] hover:border-amber-500/20 transition-all duration-300">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">En Proceso</p>
+            <h3 class="text-3xl font-extrabold text-amber-600 mt-2">{{ stats.inProgress }}</h3>
+          </div>
+          <div class="p-2 rounded-xl bg-amber-100 border border-amber-200 text-amber-600">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center text-xs text-amber-400/80 font-medium">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-400 mr-1.5 animate-pulse"></span>
+          <span>Siendo atendidos actualmente</span>
+        </div>
+      </div>
+
+      <!-- Stat 4: Closed -->
+      <div class="glass-panel p-6 rounded-2xl border border-slate-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.2)] hover:border-emerald-500/20 transition-all duration-300">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Cerrados</p>
+            <h3 class="text-3xl font-extrabold text-emerald-600 mt-2">{{ stats.closed }}</h3>
+          </div>
+          <div class="p-2 rounded-xl bg-emerald-100 border border-emerald-200 text-emerald-600">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center text-xs text-emerald-400/80 font-medium">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5"></span>
+          <span>Casos resueltos con éxito</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Active Loading state spinner -->
+    <div *ngIf="isLoading" class="glass-panel p-16 rounded-2xl text-center border border-slate-200/80">
+      <div class="inline-block animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-indigo-500 mb-4"></div>
+      <p class="text-slate-400 text-sm font-semibold animate-pulse-slow">Estableciendo sincronización segura de base de datos...</p>
+    </div>
+
+    <!-- Main Content Area: Table / Empty State -->
+    <div *ngIf="!isLoading && ticketData" class="glass-panel rounded-2xl border border-slate-200/80 shadow-[0_12px_40px_rgba(0,0,0,0.5)] overflow-hidden">
+      
+      <!-- Table Container -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-slate-200 bg-slate-100/50">
+              <th scope="col" class="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">ID</th>
+              <th scope="col" class="px-6 py-4 class text-xs font-semibold text-slate-400 uppercase tracking-wider">Asunto / Incidencia</th>
+              <th scope="col" class="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Estado</th>
+              <th scope="col" class="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Solicitante</th>
+              <th scope="col" class="px-6 py-4 relative"><span class="sr-only">Detalle</span></th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-slate-200/60 bg-transparent">
+            
+            <!-- Row ticket item -->
+            <tr *ngFor="let ticket of ticketData.content" class="hover:bg-white/20 transition-all duration-200">
+              
+              <!-- ID block -->
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-indigo-400/80">
+                #{{ ticket.id }}
+              </td>
+              
+              <!-- Details block -->
+              <td class="px-6 py-4">
+                <div class="text-sm font-semibold text-slate-900 tracking-wide">{{ ticket.title }}</div>
+                <div class="text-xs text-slate-400 truncate max-w-sm mt-0.5">{{ ticket.description }}</div>
+              </td>
+              
+              <!-- Status block -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-3 py-1 rounded-full text-xs font-bold tracking-wider inline-flex justify-center"
+                      [ngClass]="getStatusBadgeClass(ticket.status)">
+                  {{ ticket.status }}
+                </span>
+              </td>
+              
+              <!-- Creator block -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="inline-flex items-center px-2 py-0.5 rounded-lg bg-slate-200/60 text-slate-600 text-xs border border-slate-300/30 font-mono">
+                  {{ ticket.creatorEmail }}
+                </div>
+              </td>
+              
+              <!-- Action block -->
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                <a [routerLink]="['/dashboard/ticket', ticket.id]"
+                   class="inline-flex items-center text-indigo-400 hover:text-indigo-300 font-bold hover:underline transition-colors duration-200">
+                  Ver detalle
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 ml-1">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                  </svg>
+                </a>
+              </td>
+            </tr>
+
+            <!-- Empty database state view -->
+            <tr *ngIf="ticketData.content.length === 0">
+              <td colspan="5" class="px-6 py-16 text-center text-slate-400">
+                <div class="w-16 h-16 rounded-full bg-white border border-slate-200 text-slate-600 flex items-center justify-center mx-auto mb-4 animate-pulse-slow">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.03 0 1.9.693 2.166 1.638m-7.377 2.24a4.5 4.5 0 1 1 9 0M10.5 7.5h.008v.008h-.008V7.5Zm6 0h.008v.008h-.008V7.5Z" />
+                  </svg>
+                </div>
+                <h3 class="text-base font-bold text-slate-900 tracking-wide">No se encontraron tickets</h3>
+                <p class="text-sm text-slate-400 max-w-sm mx-auto mt-1">La bandeja de incidentes está limpia. Todos los incidentes técnicos han sido asignados y resueltos.</p>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- Glassmorphism Creation Modal overlay -->
+<div *ngIf="showModal" class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
+  
+  <!-- Semi transparent dark backdrop blur -->
+  <div (click)="toggleModal()" class="fixed inset-0 bg-slate-100/80 backdrop-blur-md transition-opacity"></div>
+
+  <!-- Modal card -->
+  <div class="glass-panel w-full max-w-lg rounded-2xl relative z-10 border border-slate-200 shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden animate-float">
+    
+    <div class="px-6 py-5 border-b border-slate-200/80 bg-slate-100/50 flex items-center justify-between">
+      <h3 class="text-xl font-bold text-slate-900">Crear Nuevo Ticket</h3>
+      <button (click)="toggleModal()" class="p-1 rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <form [formGroup]="ticketForm" (ngSubmit)="saveTicket()" class="p-6 space-y-6">
+      
+      <!-- Ticket title field -->
+      <div>
+        <label for="title" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Asunto / Resumen corto</label>
+        <input id="title" type="text" formControlName="title"
+               class="glass-input block w-full px-3 py-3 rounded-xl sm:text-sm border-slate-300/50"
+               placeholder="Ej: Caída de internet en planta baja"
+               [ngClass]="{'border-red-500/50 focus:border-red-500': ticketForm.get('title')?.invalid && ticketForm.get('title')?.touched}">
+        
+        <p *ngIf="ticketForm.get('title')?.invalid && ticketForm.get('title')?.touched" class="mt-2 text-xs text-red-400 font-medium flex items-center">
+          <span class="mr-1 inline-block w-1 h-1 rounded-full bg-red-400"></span>
+          El asunto es requerido y debe tener al menos 5 caracteres.
+        </p>
+      </div>
+
+      <!-- Ticket description field -->
+      <div>
+        <label for="description" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Descripción detallada del incidente</label>
+        <textarea id="description" formControlName="description" rows="4"
+                  class="glass-input block w-full px-3 py-3 rounded-xl sm:text-sm border-slate-300/50 resize-none"
+                  placeholder="Por favor, describe detalladamente los síntomas y los equipos afectados..."
+                  [ngClass]="{'border-red-500/50 focus:border-red-500': ticketForm.get('description')?.invalid && ticketForm.get('description')?.touched}"></textarea>
+        
+        <p *ngIf="ticketForm.get('description')?.invalid && ticketForm.get('description')?.touched" class="mt-2 text-xs text-red-400 font-medium flex items-center">
+          <span class="mr-1 inline-block w-1 h-1 rounded-full bg-red-400"></span>
+          La descripción detallada debe tener al menos 10 caracteres.
+        </p>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-200/80">
+        
+        <button (click)="toggleModal()" type="button"
+                class="px-5 py-2.5 rounded-xl border border-slate-200 hover:border-slate-300 text-sm font-semibold text-slate-600 hover:text-slate-900 bg-slate-100/70 hover:bg-white transition-all duration-200">
+          Cancelar
+        </button>
+
+        <button type="submit" [disabled]="ticketForm.invalid || isSaving"
+                class="inline-flex justify-center items-center px-5 py-2.5 rounded-xl border border-indigo-500/30 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.2)] hover:shadow-[0_0_25px_rgba(99,102,241,0.4)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+          <span *ngIf="!isSaving" class="flex items-center">
+            Crear Ticket
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 ml-2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+          </span>
+          <span *ngIf="isSaving" class="flex items-center">
+            <svg class="animate-spin h-4 w-4 mr-2 text-slate-900" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Procesando...
+          </span>
+        </button>
+
+      </div>
+    </form>
+
+  </div>
+</div>
+

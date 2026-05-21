@@ -1,0 +1,229 @@
+<div class="min-h-screen relative p-4 md:p-8 overflow-hidden bg-slate-50">
+  
+  <!-- Glowing Spotlights in the background -->
+  <div class="ambient-glow"></div>
+  <div class="absolute w-[450px] h-[450px] rounded-full bg-indigo-500/5 blur-[130px] top-1/4 left-1/4 animate-pulse-slow"></div>
+  <div class="absolute w-[400px] h-[400px] rounded-full bg-purple-500/5 blur-[120px] bottom-1/4 right-1/4 animate-float"></div>
+
+  <div class="max-w-6xl mx-auto relative z-10 space-y-6">
+    
+    <!-- Top Action Bar -->
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+      
+      <!-- Back button -->
+      <button (click)="goBack()" class="inline-flex items-center text-sm font-bold text-slate-400 hover:text-slate-900 transition-colors duration-200 group">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+        </svg>
+        Volver al panel
+      </button>
+
+      <!-- Action Buttons for status change (Solo para Agentes) -->
+      <div class="flex space-x-3" *ngIf="ticket && authService.isAgent()">
+        
+        <!-- Action: Take Ticket (OPEN -> IN_PROGRESS) -->
+        <button *ngIf="ticket.status === 'OPEN'" 
+                (click)="changeStatus('IN_PROGRESS')"
+                [disabled]="isUpdating"
+                class="px-4 py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.2)] hover:shadow-[0_0_25px_rgba(245,158,11,0.4)] text-sm font-bold transition-all duration-300 disabled:opacity-50 flex items-center">
+          <svg *ngIf="!isUpdating" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+          </svg>
+          <svg *ngIf="isUpdating" class="animate-spin h-4 w-4 mr-2 text-slate-900" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          {{ isUpdating ? 'Procesando...' : 'Tomar Ticket' }}
+        </button>
+
+        <!-- Action: Close Ticket (IN_PROGRESS -> CLOSED) -->
+        <button *ngIf="ticket.status === 'IN_PROGRESS'" 
+                (click)="changeStatus('CLOSED')"
+                [disabled]="isUpdating"
+                class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] text-sm font-bold transition-all duration-300 disabled:opacity-50 flex items-center">
+          <svg *ngIf="!isUpdating" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+          <svg *ngIf="isUpdating" class="animate-spin h-4 w-4 mr-2 text-slate-900" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Cerrar Incidencia
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Glass skeleton loader -->
+    <div *ngIf="isLoading" class="animate-pulse space-y-6">
+      <div class="h-10 bg-white rounded-xl w-1/3 border border-slate-200"></div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 h-96 bg-white rounded-2xl border border-slate-200"></div>
+        <div class="h-96 bg-white rounded-2xl border border-slate-200"></div>
+      </div>
+    </div>
+
+    <!-- Main Detail Grid -->
+    <div *ngIf="!isLoading && ticket" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <!-- Left Column: Master Details Card -->
+      <div class="lg:col-span-2 space-y-6">
+        <div class="glass-panel rounded-2xl border border-slate-200/80 shadow-[0_12px_40px_rgba(0,0,0,0.5)] p-6 md:p-8">
+          
+          <!-- State Badge and Ticket Number Header -->
+          <div class="flex items-center space-x-4 mb-6">
+            <span class="px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase inline-flex justify-center"
+                  [ngClass]="getStatusBadgeClass(ticket.status)">
+              {{ ticket.status }}
+            </span>
+            <span class="text-slate-400 font-mono text-sm">Ticket #{{ ticket.id }}</span>
+          </div>
+
+          <!-- Ticket Title -->
+          <h1 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight mb-4">{{ ticket.title }}</h1>
+          
+          <!-- Ticket Description content -->
+          <div class="text-slate-600 leading-relaxed text-base bg-slate-50/40 border border-slate-900/60 p-5 rounded-xl mb-8">
+            <p class="whitespace-pre-line">{{ ticket.description }}</p>
+          </div>
+
+          <!-- Metadata Deck -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-slate-200/60">
+            
+            <div class="p-4 rounded-xl bg-slate-100/60 border border-slate-200 flex items-center space-x-3">
+              <div class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                </svg>
+              </div>
+              <div>
+                <p class="text-[10px] text-slate-400 uppercase font-semibold tracking-wider">Solicitante</p>
+                <p class="text-sm text-slate-700 font-mono font-medium mt-0.5">{{ ticket.creatorEmail }}</p>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl bg-slate-100/60 border border-slate-200 flex items-center space-x-3">
+              <div class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+                </svg>
+              </div>
+              <div>
+                <p class="text-[10px] text-slate-400 uppercase font-semibold tracking-wider">Asignado a</p>
+                <p class="text-sm font-mono mt-0.5 font-medium"
+                   [ngClass]="ticket.assigneeEmail ? 'text-slate-700' : 'text-slate-400 italic'">
+                  {{ ticket.assigneeEmail || 'Sin asignar' }}
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Right Column: Interactive Activity Timeline -->
+      <div class="space-y-6">
+        <div class="glass-panel rounded-2xl border border-slate-200/80 shadow-[0_12px_40px_rgba(0,0,0,0.5)] p-6">
+          <h3 class="text-lg font-bold text-slate-900 mb-6 flex items-center tracking-tight">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mr-2 text-indigo-400">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+            Historial de Actividad
+          </h3>
+
+          <div class="flow-root">
+            <ul role="list" class="-mb-8">
+              
+              <!-- Event 1: Creation -->
+              <li>
+                <div class="relative pb-8">
+                  <!-- Vertical connecting line -->
+                  <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-slate-100" aria-hidden="true"
+                        *ngIf="ticket.status !== 'OPEN'"></span>
+                  
+                  <div class="relative flex space-x-3">
+                    <div>
+                      <span class="h-8 w-8 rounded-full bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center ring-8 ring-white text-indigo-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                      </span>
+                    </div>
+                    <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                      <div>
+                        <p class="text-sm text-slate-600">
+                          Ticket creado por <span class="font-bold text-slate-900">{{ ticket.creatorEmail }}</span>
+                        </p>
+                      </div>
+                      <div class="text-right text-[10px] font-mono text-slate-400 whitespace-nowrap pt-0.5">
+                        {{ ticket.createdAt | date:'shortTime' }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+
+              <!-- Event 2: In Progress -->
+              <li *ngIf="ticket.status !== 'OPEN'">
+                <div class="relative pb-8">
+                  <!-- Vertical connecting line -->
+                  <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-slate-100" aria-hidden="true"
+                        *ngIf="ticket.status === 'CLOSED'"></span>
+                  
+                  <div class="relative flex space-x-3">
+                    <div>
+                      <span class="h-8 w-8 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center ring-8 ring-white text-amber-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 animate-spin-slow">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                        </svg>
+                      </span>
+                    </div>
+                    <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                      <div>
+                        <p class="text-sm text-slate-600">
+                          Estado actualizado a <span class="font-bold text-amber-400">IN_PROGRESS</span>
+                        </p>
+                        <p class="text-xs text-slate-400 mt-0.5" *ngIf="ticket.assigneeEmail">
+                          Asignado a: <span class="font-semibold text-slate-600">{{ ticket.assigneeEmail }}</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+
+              <!-- Event 3: Closed -->
+              <li *ngIf="ticket.status === 'CLOSED'">
+                <div class="relative">
+                  <div class="relative flex space-x-3">
+                    <div>
+                      <span class="h-8 w-8 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center ring-8 ring-white text-emerald-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                      </span>
+                    </div>
+                    <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                      <div>
+                        <p class="text-sm text-slate-600">
+                          Caso resuelto y <span class="font-bold text-emerald-400">CERRADO</span>
+                        </p>
+                        <p class="text-xs text-slate-400 mt-0.5">
+                          Soporte técnico finalizado con éxito.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
