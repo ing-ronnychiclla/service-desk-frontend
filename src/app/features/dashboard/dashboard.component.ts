@@ -25,16 +25,21 @@ export class DashboardComponent implements OnInit {
   showModal: boolean = false;
   isSaving: boolean = false;
 
-  // Estadísticas globales calculated on load
-  stats = {
-    total: 0,
-    open: 0,
-    inProgress: 0,
-    closed: 0
-  };
+  // Estadísticas globales persistidas en el servicio
+  get stats(): { total: number; open: number; inProgress: number; closed: number } {
+    return this.ticketService.stats;
+  }
+  set stats(value: { total: number; open: number; inProgress: number; closed: number }) {
+    this.ticketService.stats = value;
+  }
   
-  // Estado del Filtro de Estado
-  selectedStatus: string = 'ALL';
+  // Estado del Filtro de Estado (persistido en el servicio)
+  get selectedStatus(): string {
+    return this.ticketService.selectedStatus;
+  }
+  set selectedStatus(status: string) {
+    this.ticketService.selectedStatus = status;
+  }
 
   // Formulario Reactivo
   ticketForm: FormGroup = this.fb.group({
@@ -44,9 +49,26 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTickets();
+    this.loadStats();
   }
 
   // --- Métodos de Lógica ---
+
+  loadStats(): void {
+    // Si ya estamos cargando todos los tickets en la tabla, no es necesario hacer otra petición en segundo plano
+    if (this.selectedStatus === 'ALL') {
+      return;
+    }
+
+    this.ticketService.getTickets(0, 100).subscribe({
+      next: (res) => {
+        this.calculateStats(res.content);
+      },
+      error: (err) => {
+        console.error('Error al cargar estadísticas en segundo plano:', err);
+      }
+    });
+  }
 
   loadTickets(): void {
     this.isLoading = true;

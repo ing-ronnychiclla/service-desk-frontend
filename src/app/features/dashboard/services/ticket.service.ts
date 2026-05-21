@@ -13,6 +13,17 @@ export class TicketService {
   private authService = inject(AuthService);
   private readonly API_URL = `${environment.apiUrl}/tickets`;
 
+  // Estado persistente del filtro de estado para el Dashboard
+  public selectedStatus: string = 'ALL';
+
+  // Estadísticas globales del Dashboard (persistidas para evitar reseteos al navegar)
+  public stats = {
+    total: 0,
+    open: 0,
+    inProgress: 0,
+    closed: 0
+  };
+
   // --- Métodos de Consumo y Negocio ---
 
   createTicket(ticket: { title: string; description: string }): Observable<Ticket> {
