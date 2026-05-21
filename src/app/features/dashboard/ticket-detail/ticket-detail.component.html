@@ -36,8 +36,8 @@
           {{ isUpdating ? 'Procesando...' : 'Tomar Ticket' }}
         </button>
 
-        <!-- Action: Close Ticket (IN_PROGRESS -> CLOSED) -->
-        <button *ngIf="ticket.status === 'IN_PROGRESS'" 
+        <!-- Action: Close Ticket (IN_PROGRESS -> CLOSED) (Solo agente asignado) -->
+        <button *ngIf="ticket.status === 'IN_PROGRESS' && ticket.assigneeEmail === authService.getUserEmail()" 
                 (click)="changeStatus('CLOSED')"
                 [disabled]="isUpdating"
                 class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] text-sm font-bold transition-all duration-300 disabled:opacity-50 flex items-center">
@@ -50,6 +50,15 @@
           </svg>
           Cerrar Incidencia
         </button>
+
+        <!-- Banner informativo si ya fue tomado por otro agente -->
+        <div *ngIf="ticket.status === 'IN_PROGRESS' && ticket.assigneeEmail !== authService.getUserEmail()" 
+             class="px-4 py-2.5 bg-amber-500/10 border border-amber-500/20 text-amber-700 rounded-xl flex items-center space-x-2 text-xs font-bold shadow-sm backdrop-blur-md">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-amber-600">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3Z" />
+          </svg>
+          <span>En atención por: <strong class="underline">{{ ticket.assigneeEmail }}</strong></span>
+        </div>
       </div>
 
     </div>
